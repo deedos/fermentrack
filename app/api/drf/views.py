@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination, filters
+#from rest_framework_filter import rest_framework_filters as filters
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from app.api.drf.serializers import CreateUserSerializer, UserSerializer, BeerSerializer, BrewPiDeviceSerializer, FermentationProfileSerializer, FermentationProfilePointSerializer, BeerLogPointSerializer
 from app.models import Beer, BrewPiDevice, FermentationProfile, FermentationProfilePoint, BeerLogPoint
 from rest_framework import generics
+from dateutil.parser import parse
 
 class CreateUserViewSet(viewsets.ModelViewSet):
     """
@@ -94,13 +96,42 @@ class FermentationProfilePointViewSet(viewsets.ModelViewSet):
     queryset = FermentationProfilePoint.objects.all()
     serializer_class = FermentationProfilePointSerializer
 
+#class OrderFilter(filters.FilterSet):
+#    log_time = filters.RangeFilter(name='log_time')
+
+class BeerLogPagination(pagination.LimitOffsetPagination):
+    # Class to define custom limits to queries (applied here only to BeerLogPoint endpoint)
+    default_limit = 50
+
 class BeerLogPointViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint for devices/beers logpoints 
     """
     permission_classes = [IsAuthenticated,]
-    queryset = BeerLogPoint.objects.all()
+    #queryset = BeerLogPoint.objects.all()
     serializer_class = BeerLogPointSerializer
+    pagination_class = BeerLogPagination
+    
 
+    
+    def get_queryset(self):
+        #name = self.kwargs.get('ak', None)
+        filter = {}
+        start = self.request.query_params.get('start', None)
+        end = self.request.query_params.get('end', None)
+        #queryset = BeerLogPoint.objects.all()
+        #if log_time is not None:
+        #queryset = BeerLogPoint.objects.filter(log_time__range(start, end))
+        queryset = BeerLogPoint.objects.all()
+        if start is not None:
+            filter['log_time__gte'] = parse(start)
+
+        if end is not None:
+            filter['log_time__lte'] = parse(end)
+
+        queryset = queryset.filter(**filter)
+
+        return queryset 
+        #return queryset
 
 

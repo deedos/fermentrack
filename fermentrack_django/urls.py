@@ -36,7 +36,7 @@ router.register(r'create_user', CreateUserViewSet)
 router.register(r'devices', BrewPiDeviceViewSet)
 router.register(r'profiles', FermentationProfileViewSet)
 router.register(r'profile_points', FermentationProfilePointViewSet)
-router.register(r'beer_points', BeerLogPointViewSet)
+router.register(r'beer_points', BeerLogPointViewSet, basename="beer_points")
 
 # In addition to urlpatterns below, three paths are mapped by the nginx config file:
 # r'^static/' - Maps to collected_static/. Contains collected static files.

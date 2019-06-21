@@ -1212,7 +1212,7 @@ class BeerLogPoint(models.Model):
     """
 
     class Meta:
-        managed = False  # Since we're using flatfiles rather than a database
+       # managed = False  # Since we're using flatfiles rather than a database
         verbose_name = "Beer Log Point"
         verbose_name_plural = "Beer Log Points"
         ordering = ['log_time']
@@ -1247,7 +1247,7 @@ class BeerLogPoint(models.Model):
     # Adding temp_format here so we can do conversions later on if we want to
     temp_format = models.CharField(max_length=1, choices=TEMP_FORMAT_CHOICES, default='C')
 
-    associated_beer = models.ForeignKey(Beer, db_index=True, on_delete=models.DO_NOTHING)
+    associated_beer = models.ForeignKey(Beer, db_index=True, on_delete=models.DO_NOTHING, null=True)
 
     gravity = models.DecimalField(max_digits=5, decimal_places=3, null=True)
     gravity_temp = models.DecimalField(max_digits=13, decimal_places=10, null=True)
@@ -1425,7 +1425,7 @@ class BeerLogPoint(models.Model):
                 json_existed = check_and_write_annotation_json_head(annotation_json)
                 write_annotation_json(annotation_json, annotation_data, json_existed)
 
-        # super(BeerLogPoint, self).save(*args, **kwargs)
+            super(BeerLogPoint, self).save(*args, **kwargs)
 
 
 # A model representing the fermentation profile as a whole
