@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets, pagination, filters
 #from rest_framework_filter import rest_framework_filters as filters
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action, detail_route
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from app.api.drf.serializers import CreateUserSerializer, UserSerializer, BeerSerializer, BrewPiDeviceSerializer, FermentationProfileSerializer, FermentationProfilePointSerializer, BeerLogPointSerializer
 from app.models import Beer, BrewPiDevice, FermentationProfile, FermentationProfilePoint, BeerLogPoint
 from rest_framework import generics
 from dateutil.parser import parse
+import json
 
 class CreateUserViewSet(viewsets.ModelViewSet):
     """
@@ -43,15 +44,6 @@ class BeerViewSet(viewsets.ModelViewSet):
     http_method_names = ['get','update', 'post']
     
 
-    	#if request.method == 'POST':
-
-    #@api_view(['GET', 'POST'])
-    #def hello_world(request):
-    #	if request.method == 'POST':
-    #    	return Response({"message": "Got some data!", "data": request.data})
-    #	return Response({"message": "Hello, world!"})
-
-
 class BrewPiDeviceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows brewpidevices to be viewd and created.
@@ -78,6 +70,28 @@ class BrewPiDeviceViewSet(viewsets.ModelViewSet):
        # self.perform_update(serializer)
 
         #return Response(serializer.data)
+    @detail_route(methods=['POST'])
+    def start_brew(self, request, pk=None):
+#        serializer = BrewPiDeviceSerializer()
+        try:
+            #beer_name = obj.active_beer_name
+            data = BrewPiDevice.start_new_brew()
+            return data
+	#else 
+        except TypeError:
+            return None 
+
+
+    #@api_view(['GET', 'POST'])
+    #def start_brew(request):
+    #    try:
+            #beer_name = obj.active_beer_name
+    #        data = BrewPiDevice.start_new_brew()
+    #        return data
+	#else 
+     #   except TypeError:
+     #       return None 
+
 
 
 class FermentationProfileViewSet(viewsets.ModelViewSet):
@@ -110,28 +124,22 @@ class BeerLogPointViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated,]
     #queryset = BeerLogPoint.objects.all()
     serializer_class = BeerLogPointSerializer
-    pagination_class = BeerLogPagination
+    #pagination_class = BeerLogPagination 
     
-
-    
+    # allow the query to specify a start and end time 
     def get_queryset(self):
-        #name = self.kwargs.get('ak', None)
         filter = {}
         start = self.request.query_params.get('start', None)
-        end = self.request.query_params.get('end', None)
-        #queryset = BeerLogPoint.objects.all()
-        #if log_time is not None:
-        #queryset = BeerLogPoint.objects.filter(log_time__range(start, end))
-        queryset = BeerLogPoint.objects.all()
+        end   = self.request.query_params.get('end', None)
+        beer =  self.request.query_params.get('beer', None)
+        all_queryset = BeerLogPoint.objects.all()
         if start is not None:
             filter['log_time__gte'] = parse(start)
-
         if end is not None:
             filter['log_time__lte'] = parse(end)
-
-        queryset = queryset.filter(**filter)
-
-        return queryset 
-        #return queryset
+        if beer is not None:
+            filter['associated_beer'] = beer
+        queryset = all_queryset.filter(**filter)
+        return queryset
 
 

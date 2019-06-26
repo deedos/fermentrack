@@ -36,12 +36,9 @@ class BeerSerializer(serializers.ModelSerializer):
         model = Beer
         fields = '__all__'
 
-
-
 class BrewPiDeviceSerializer(serializers.ModelSerializer):
 
     active_beer_name = serializers.SerializerMethodField()
-    #controller_beer_data = serializers.SerializerMethodField()
     controller_fridge_temp = serializers.SerializerMethodField() 
     controller_beer_temp = serializers.SerializerMethodField() # get from live LCD data, 
     active_beer_temp = serializers.SerializerMethodField()  
@@ -50,12 +47,6 @@ class BrewPiDeviceSerializer(serializers.ModelSerializer):
     active_fridge_set = serializers.SerializerMethodField() 
     controller_mode = serializers.SerializerMethodField() 
 
-    #start_new_brew = serializers.SerializerMethodField()
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'request' in self.context and self.context['request'].method == 'POST':
-            start_new_brew = serializers.SerializerMethodField()
-
     class Meta:
         model = BrewPiDevice
         fields = ('id', 'device_name', 'logging_status', 'active_beer', 'active_beer_name', 'controller_fridge_temp', 'controller_beer_temp', 'active_beer_temp', 'active_fridge_temp', 'active_beer_set', 'active_fridge_set', 'controller_mode')
@@ -63,28 +54,24 @@ class BrewPiDeviceSerializer(serializers.ModelSerializer):
     # Update Device active_beer and start logging tha same beer
 
     def update(self, instance, validated_data):
-        # Update the Foo instance
+        # Update Device fctive_beer and loggin_status fileds. Also, based on loggin_status, run accordingly commands on brewpi script 
         instance.active_beer = validated_data['active_beer']
-        #beer_name = instance.active_beer.name
+        instance.logging_status = validated_data['logging_status']
+        beer_name = instance.active_beer.name
+        if instance.logging_status == 'active':
+            instance.send_message("startNewBrew", message_extended=beer_name, read_response=True) 
+        elif instance.logging_status == 'paused':
+            instance.manage_logging(status='pause')
+        elif instance.logging_status == 'stopped':
+            instance.manage_logging(status='stop')
         instance.save()
-        #instance.send_message("startNewBrew", message_extended=beer_name, read_response=True)
         return instance 
 
     def get_active_beer_name(self, obj):
         if obj.active_beer:   
             return obj.active_beer.name
         else:
-            return ""
-    
-    def start_new_brew(self, obj):
-        try:
-            beer_name = obj.active_beer.name
-            data = obj.send_message("startNewBrew", extended_message=beer_name, read_response=True)
-            return data
-	#else 
-	 #   return False
-        except TypeError:
-            return None 
+            return "" 
     
     def get_controller_fridge_temp(self, obj):
         try:  
@@ -98,13 +85,7 @@ class BrewPiDeviceSerializer(serializers.ModelSerializer):
             data = json.loads(obj.send_message("lcd", read_response=True))
             return data[1]
         except TypeError:
-            return None  
-    
- #   def get_controller_beer_data(self, obj):
-  #      try:  
-   #         return json.loads(obj.send_message("getDashInfo", read_response=True))
-    #    except TypeError:
-     #       return None 
+            return None   
 
     def get_active_beer_temp(self, obj):
         try:  
@@ -140,7 +121,6 @@ class BrewPiDeviceSerializer(serializers.ModelSerializer):
             return data['Mode'] 
         except TypeError:
             return None 
-
 
 
 class BeerLogPointSerializer(serializers.ModelSerializer):

@@ -80,7 +80,7 @@ List, Update (set active_beer) and Create Devices
 
 > Mandatory Parameters in header : **token** 
 
-> Mandatory Parameters in body : **device_name** and  **active_beer**
+> Mandatory Parameters in body : **device_name** and  **active_beer** 
 
 > GET - http://your-url/devices/ - **List all devices**
 
@@ -107,6 +107,10 @@ curl -H "Authorization: JWT
 ### Request example (Update Device)
 
     curl -H "Content-Type: application/json" -X PUT -H "Authorization: JWT <valid_token>"  -d '{"device_name" : "my_device", "active_beer":1}' http://your-url/api-v1/devices/<device_id>/
+
+### REsponse Example (Update Device)
+
+    {"id":3,"device_name":"fermentero6","logging_status":"stopped","active_beer":14,"active_beer_name":"oooo","controller_fridge_temp":null,"controller_beer_temp":null,"active_beer_temp":null,"active_fridge_temp":null,"active_beer_set":null,"active_fridge_set":null,"controller_mode":null}
 
 ## Beers (GET/POST)
 List Beers and Create new beer
