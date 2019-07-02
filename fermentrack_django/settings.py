@@ -272,7 +272,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-    )
+    ),
+    'COERCE_DECIMAL_TO_STRING': False,
 }
 
 JWT_AUTH = { 

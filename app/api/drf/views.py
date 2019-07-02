@@ -53,47 +53,6 @@ class BrewPiDeviceViewSet(viewsets.ModelViewSet):
     serializer_class = BrewPiDeviceSerializer
     http_method_names = ['get','update', 'put', 'post']
  
-    #def post(self, request, format=None):
-    #    serializer = BrewPiDeviceSerializer(data=request.data)
-    #    if serializer.is_valid():
-    #        serializer.save()
-    #        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    #def update(self, request, *args, **kwargs):
-    #    instance = self.get_object()
-    #    instance.active_beer = request.data.get("active_beer")
-    #    instance.save()
-
-     #   serializer = self.get_serializer(instance)
-      #  serializer.is_valid(raise_exception=True)
-       # self.perform_update(serializer)
-
-        #return Response(serializer.data)
-    @detail_route(methods=['POST'])
-    def start_brew(self, request, pk=None):
-#        serializer = BrewPiDeviceSerializer()
-        try:
-            #beer_name = obj.active_beer_name
-            data = BrewPiDevice.start_new_brew()
-            return data
-	#else 
-        except TypeError:
-            return None 
-
-
-    #@api_view(['GET', 'POST'])
-    #def start_brew(request):
-    #    try:
-            #beer_name = obj.active_beer_name
-    #        data = BrewPiDevice.start_new_brew()
-    #        return data
-	#else 
-     #   except TypeError:
-     #       return None 
-
-
-
 class FermentationProfileViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

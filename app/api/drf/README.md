@@ -80,7 +80,7 @@ List, Update (set active_beer) and Create Devices
 
 > Mandatory Parameters in header : **token** 
 
-> Mandatory Parameters in body : **device_name** and  **active_beer** 
+> Mandatory Parameters in body : **device_name**, **active_beer** and **logging_status** 
 
 > GET - http://your-url/devices/ - **List all devices**
 
@@ -106,7 +106,9 @@ curl -H "Authorization: JWT
 
 ### Request example (Update Device)
 
-    curl -H "Content-Type: application/json" -X PUT -H "Authorization: JWT <valid_token>"  -d '{"device_name" : "my_device", "active_beer":1}' http://your-url/api-v1/devices/<device_id>/
+_ OBS: logging_status statuses also run same commands on brewpi, for instance, 'active' starts logging the active_beer, 'paused' pauses logging the active_beer and 'stopped' stops logging active_beer and sets it to None,   _
+
+    curl -H "Content-Type: application/json" -X PUT -H "Authorization: JWT <valid_token>"  -d '{"device_name" : "my_device", "active_beer":1, "logging_status":"active""}' http://your-url/api-v1/devices/<device_id>/
 
 ### REsponse Example (Update Device)
 
